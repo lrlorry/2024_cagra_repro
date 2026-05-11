@@ -1,0 +1,21 @@
+# Build outputs
+plain_core
+engineered_core
+
+# Benchmark outputs
+*.csv
+*.png
+*.pdf
+
+# Data files
+*.fvecs
+*.ivecs
+*.bvecs
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
