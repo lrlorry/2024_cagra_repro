@@ -14,9 +14,9 @@ constexpr int kInternalTopM = 64;
 constexpr int kSingleCtaSearchWidth = 2;
 constexpr int kMaxSearchIters = 64;
 constexpr int kBlockThreads = 128;
-// cuVS 动态计算: itopk_size + search_width * graph_degree * max_iterations
-// = 64 + 2 * 64 * 64 = 8256 → 取下一个 2 的幂
-constexpr int kHashSize = 16384;
+// sm_89 shared memory 上限 48KB，kHashSize=16384(64KB) 超限。
+// 8192 覆盖到 max_iters=32（64+2×64×32=4160），足够 Pareto 实验。
+constexpr int kHashSize = 8192;
 constexpr int kMultiCtaPerQuery = 4;
 
 constexpr unsigned kParentMask = 0x80000000U;
