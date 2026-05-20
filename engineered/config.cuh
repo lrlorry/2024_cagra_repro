@@ -2,8 +2,8 @@
 
 namespace cagra_repro::engineered {
 
-constexpr int kInitialDegree = 32;
-constexpr int kGraphDegree = 16;
+constexpr int kInitialDegree = 128;  // cuVS: intermediate_graph_degree=128
+constexpr int kGraphDegree = 64;     // cuVS: graph_degree=64
 constexpr int kNnDescentIters = 8;
 constexpr int kTopK = 10;
 constexpr int kInternalTopM = 64;
