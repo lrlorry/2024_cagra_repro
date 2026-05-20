@@ -1,0 +1,18 @@
+{
+  "configurations": [
+    {
+      "name": "CUDA",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "/Users/apple/cuda-include",
+        "/Users/apple/github/cuvs/cpp/include"
+      ],
+      "defines": ["__CUDACC__"],
+      "compilerPath": "/usr/bin/clang",
+      "cStandard": "c17",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "macos-clang-x64"
+    }
+  ],
+  "version": 4
+}

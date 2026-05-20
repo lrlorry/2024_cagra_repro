@@ -92,10 +92,10 @@ def main():
     parser.add_argument("--k",       type=int, default=10)
     parser.add_argument("--repeats", type=int, default=5)
     parser.add_argument("--out",     default="cuvs_sweep.csv")
-    # Graph params — match engineered/config.cuh defaults for fair comparison
-    parser.add_argument("--intermediate-graph-degree", type=int, default=32,
+    # Graph params — cuVS defaults
+    parser.add_argument("--intermediate-graph-degree", type=int, default=128,
                         dest="intermediate_graph_degree")
-    parser.add_argument("--graph-degree",              type=int, default=16,
+    parser.add_argument("--graph-degree",              type=int, default=64,
                         dest="graph_degree")
     parser.add_argument("--itopk-size",                type=int, default=64,
                         dest="itopk_size")
@@ -139,7 +139,7 @@ def main():
     build_params = cagra.IndexParams(
         intermediate_graph_degree=args.intermediate_graph_degree,
         graph_degree=args.graph_degree,
-        metric="sqeuclidean",
+        build_algo="nn_descent",
     )
     print(f"building index (n={base.shape[0]} degree={args.graph_degree}) ...")
     t0 = time.perf_counter()
@@ -179,7 +179,7 @@ def main():
             med_ms = times[len(times) // 2]
             qps    = nq / (med_ms / 1000.0)
 
-            neighbors = cp.asnumpy(neighbors_gpu).astype(np.int32)
+            neighbors = cp.asarray(neighbors_gpu).get().astype(np.int32)
             recall = recall_at_k(neighbors, gt, k)
 
             print(f"{max_iters:<12}  {recall:<10.4f}  {qps:<14.1f}  {med_ms:.2f}")
