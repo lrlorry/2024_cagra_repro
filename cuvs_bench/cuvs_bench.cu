@@ -255,6 +255,9 @@ int main(int argc, char** argv)
 
   FILE* csv = fopen(out_csv, "w");
   if (!csv) { fprintf(stderr, "cannot write %s\n", out_csv); return 1; }
+  // 首行写 build 元数据，便于与 engineered_core 对比构建时间
+  fprintf(csv, "# build_ms=%.1f n=%d graph_degree=%d intermediate=%d\n",
+          build_ms, n, graph_degree, intermediate_graph_degree);
   fprintf(csv, "max_iters,recall,qps,search_ms\n");
 
   printf("%-12s  %-10s  %-14s  %s\n", "max_iters", "recall@k", "QPS", "ms/batch");

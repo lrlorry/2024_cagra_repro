@@ -66,8 +66,22 @@ def save(fig, stem):
 # ── CSV loaders ────────────────────────────────────────────────────────────────
 
 def load_csv(path):
+    """Load CSV, skipping # comment lines. Returns (rows, meta) where
+    meta is a dict parsed from '# key=val ...' lines."""
+    meta = {}
+    lines = []
     with open(path, newline="") as f:
-        return list(csv.DictReader(f))
+        for line in f:
+            if line.startswith("#"):
+                for token in line[1:].split():
+                    if "=" in token:
+                        k, v = token.split("=", 1)
+                        try: meta[k] = float(v)
+                        except: meta[k] = v
+            else:
+                lines.append(line)
+    rows = list(csv.DictReader(lines))
+    return rows, meta
 
 
 def col_f(rows, key):
@@ -89,7 +103,7 @@ def plot_pareto(csvfiles, labels, out_stem):
     fig, ax = plt.subplots(figsize=(6.5, 4.5))
 
     for idx, (path, label) in enumerate(zip(csvfiles, labels)):
-        rows = load_csv(path)
+        rows, meta = load_csv(path)
         recall = col_f(rows, "recall")
         qps    = col_f(rows, "qps")
         iters  = col_i(rows, "max_iters")
@@ -107,7 +121,7 @@ def plot_pareto(csvfiles, labels, out_stem):
     ax.set_title("CAGRA — Recall@10 vs Throughput")
     ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, _: f"{x:,.0f}"))
     ax.legend(loc="lower right")
-    ax.set_xlim(left=max(0, min(col_f(load_csv(csvfiles[0]), "recall")) - 0.05))
+    ax.set_xlim(left=max(0, min(col_f(load_csv(csvfiles[0])[0], "recall")) - 0.05))
 
     save(fig, out_stem)
 
@@ -120,7 +134,7 @@ def plot_build_breakdown(csvfile, out_stem):
     CSV 格式: stage, impl, time_ms
     stages: init, nn_descent, prune, reverse, connectivity
     """
-    rows  = load_csv(csvfile)
+    rows, _ = load_csv(csvfile)
     impls = list(dict.fromkeys(r["impl"] for r in rows))  # 保序去重
 
     stage_order  = ["init", "nn_descent", "prune", "reverse", "connectivity"]
@@ -187,7 +201,7 @@ def plot_nn_descent(csvfile, out_stem):
     """
     CSV 格式: nn_iters, recall, build_ms
     """
-    rows    = load_csv(csvfile)
+    rows, _ = load_csv(csvfile)
     iters   = col_i(rows, "nn_iters")
     recall  = col_f(rows, "recall")
     build   = col_f(rows, "build_ms")
@@ -222,7 +236,7 @@ def plot_search_width(csvfile, out_stem):
     CSV 格式: search_width, max_iters, recall, qps
     每个 search_width 值画一条 Pareto 线。
     """
-    rows = load_csv(csvfile)
+    rows, _ = load_csv(csvfile)
     sws  = sorted(set(int(r["search_width"]) for r in rows))
 
     fig, ax = plt.subplots(figsize=(6.5, 4.5))
@@ -254,7 +268,7 @@ def plot_cta_regime(csvfile, out_stem):
     """
     CSV 格式: num_queries, algo, qps
     """
-    rows  = load_csv(csvfile)
+    rows, _ = load_csv(csvfile)
     algos = list(dict.fromkeys(r["algo"] for r in rows))
 
     fig, ax = plt.subplots(figsize=(6, 4))
@@ -304,7 +318,7 @@ def plot_scalability(csvfile, out_stem):
     """
     CSV 格式: n, build_ms, qps, recall  (recall=-1 表示未计算)
     """
-    rows     = load_csv(csvfile)
+    rows, _ = load_csv(csvfile)
     rows.sort(key=lambda r: int(r["n"]))
     ns       = col_i(rows, "n")
     build    = col_f(rows, "build_ms")

@@ -294,6 +294,8 @@ int main(int argc, char** argv)
 
     FILE* csv = fopen(out_csv.c_str(), "w");
     if (!csv) { fprintf(stderr, "cannot write %s\n", out_csv.c_str()); return 1; }
+    fprintf(csv, "# build_ms=%.1f n=%d kInitialDegree=%d kGraphDegree=%d kNnDescentIters=%d\n",
+            build_ms, n, kInitialDegree, kGraphDegree, kNnDescentIters);
     fprintf(csv, "max_iters,recall,qps,search_ms\n");
 
     printf("%-12s  %-10s  %-14s  %s\n", "max_iters", "recall@k", "QPS", "ms/batch");
